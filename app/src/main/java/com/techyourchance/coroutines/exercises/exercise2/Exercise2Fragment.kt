@@ -13,14 +13,12 @@ import com.techyourchance.coroutines.common.BaseFragment
 import com.techyourchance.coroutines.common.ThreadInfoLogger
 import com.techyourchance.coroutines.exercises.exercise1.GetReputationEndpoint
 import com.techyourchance.coroutines.home.ScreenReachableFromHome
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class Exercise2Fragment : BaseFragment() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
+    private var job: Job? = null
 
     override val screenTitle get() = ScreenReachableFromHome.EXERCISE_2.description
 
@@ -51,15 +49,24 @@ class Exercise2Fragment : BaseFragment() {
         btnGetReputation = view.findViewById(R.id.btn_get_reputation)
         btnGetReputation.setOnClickListener {
             logThreadInfo("button callback")
-            coroutineScope.launch {
+            job = coroutineScope.launch {
                 btnGetReputation.isEnabled = false
                 val reputation = getReputationForUser(edtUserId.text.toString())
                 Toast.makeText(requireContext(), "reputation: $reputation", Toast.LENGTH_SHORT).show()
                 btnGetReputation.isEnabled = true
             }
+            job?.invokeOnCompletion {
+                logThreadInfo("invokeOnCompletion")
+                btnGetReputation.isEnabled = true
+            }
         }
 
         return view
+    }
+
+    override fun onPause() {
+        super.onPause()
+        job?.cancel()
     }
 
     private suspend fun getReputationForUser(userId: String): Int {
