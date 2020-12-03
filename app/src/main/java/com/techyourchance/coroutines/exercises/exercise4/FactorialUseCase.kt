@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 class FactorialUseCase {
 
-    public sealed class Result {
+    sealed class Result {
         class Success(val result: BigInteger) : Result()
         object Timeout : Result()
     }
@@ -32,6 +32,7 @@ class FactorialUseCase {
 
     private fun getComputationRanges(factorialArgument: Int) : Array<ComputationRange> {
         val numberOfThreads = getNumberOfThreads(factorialArgument)
+        println("numberOfThreads $numberOfThreads")
 
         val threadsComputationRanges = Array(numberOfThreads) { ComputationRange(0, 0) }
 
@@ -48,7 +49,7 @@ class FactorialUseCase {
         }
 
         // add potentially "remaining" values to first thread's range
-        //threadsComputationRanges[0] = ComputationRange(1, threadsComputationRanges[0].end)
+        threadsComputationRanges[0] = ComputationRange(1, threadsComputationRanges[0].end)
 
         return threadsComputationRanges
     }
