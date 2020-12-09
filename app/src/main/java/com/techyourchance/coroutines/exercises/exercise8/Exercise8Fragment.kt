@@ -52,10 +52,17 @@ class Exercise8Fragment : BaseFragment() {
                     fetchAndCacheUsersUseCase.fetchAndCacheUsers(userIds)
                     updateElapsedTimeJob.cancel()
                 } catch (e: CancellationException) {
-                    updateElapsedTimeJob.cancelAndJoin()
+                    logThreadInfo("begin catch")
                     txtElapsedTime.text = ""
+                    try {
+                        updateElapsedTimeJob.cancelAndJoin()
+                    } catch (e: Throwable) {
+                        logThreadInfo(e.toString())
+                    }
+                    logThreadInfo("end catch")
                 } finally {
                     btnFetch.isEnabled = true
+                    logThreadInfo("finnaly")
                 }
             }
         }
@@ -77,6 +84,7 @@ class Exercise8Fragment : BaseFragment() {
             val elapsedTimeNano = System.nanoTime() - startTimeNano
             val elapsedTimeMs = elapsedTimeNano / 1000000
             txtElapsedTime.text = "Elapsed time: $elapsedTimeMs ms"
+            logThreadInfo("inside while")
         }
     }
 
