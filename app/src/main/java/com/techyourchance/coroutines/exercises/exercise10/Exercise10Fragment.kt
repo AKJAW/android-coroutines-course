@@ -20,8 +20,11 @@ import kotlinx.coroutines.*
 import java.lang.Exception
 
 class Exercise10Fragment : BaseFragment() {
-
-    private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
+    private val supervisorJob = SupervisorJob()
+    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        Toast.makeText(context, "Errorr", Toast.LENGTH_SHORT).show()
+    }
+    private val coroutineScope = CoroutineScope(exceptionHandler + supervisorJob + Dispatchers.Main.immediate)
 
     override val screenTitle get() = ScreenReachableFromHome.EXERCISE_10.description
 
@@ -34,6 +37,7 @@ class Exercise10Fragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         loginUseCase = compositionRoot.loginUseCaseUncaughtException
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
